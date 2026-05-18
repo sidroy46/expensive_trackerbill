@@ -54,6 +54,26 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+// Database connection middleware (connects lazily on every request to prevent Vercel boot timeouts)
+app.use(async (req, res, next) => {
+  if (req.path === '/api/diagnostics' || req.path === '/') {
+    // For diagnostics, try connecting but don't fail the request so we can still see the env status!
+    try {
+      await connectDB();
+    } catch (e) {
+      console.error('Diagnostics DB connection failed:', e.message);
+    }
+    return next();
+  }
+  
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Database connection failed', message: err.message });
+  }
+});
+
 // Diagnostics Route
 app.get('/api/diagnostics', (req, res) => {
   res.status(200).json({
@@ -114,9 +134,6 @@ if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
       console.log(`Server running on port ${PORT}`);
     });
   });
-} else {
-  // On Vercel, connect database immediately on import
-  connectDB();
 }
 
 module.exports = app;
