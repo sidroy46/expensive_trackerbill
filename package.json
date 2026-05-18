@@ -6,7 +6,7 @@
     "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "dev-backend": "cd backend && npm run dev",
     "dev-frontend": "cd frontend && npm run dev",
-    "build-frontend": "cd frontend && npm run build"
+    "build-frontend": "cd frontend && npm install --no-audit --no-fund && npm run build"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
