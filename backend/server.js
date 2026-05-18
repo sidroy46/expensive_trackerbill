@@ -28,11 +28,13 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Validate environment variables
-const requiredEnvVars = ['PORT', 'MONGODB_URI', 'GEMINI_API_KEY'];
+const requiredEnvVars = ['MONGODB_URI', 'GEMINI_API_KEY'];
 const missingEnvVars = requiredEnvVars.filter(key => !process.env[key]);
 if (missingEnvVars.length > 0) {
   console.error(`Error: Missing required environment variables: ${missingEnvVars.join(', ')}`);
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 }
 
 const expenseRoutes = require('./routes/expenseRoutes');
@@ -51,6 +53,16 @@ const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
+
+// Diagnostics Route
+app.get('/api/diagnostics', (req, res) => {
+  res.status(200).json({
+    vercel: !!process.env.VERCEL,
+    mongodb_uri_exists: !!process.env.MONGODB_URI,
+    gemini_api_key_exists: !!process.env.GEMINI_API_KEY,
+    database_connected: mongoose.connection.readyState === 1
+  });
+});
 
 // Test / Route
 app.get('/', (req, res) => {
