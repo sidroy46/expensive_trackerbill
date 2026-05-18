@@ -10,13 +10,15 @@ exports.extractExpense = async (req, res) => {
       return res.status(400).json({ message: 'No image provided' });
     }
 
-    const imagePath = req.file.path;
+    const fileBuffer = req.file.buffer;
     const mimeType = req.file.mimetype;
+    const originalName = req.file.originalname;
 
-    const extractedData = await extractExpenseDetails(imagePath, mimeType);
+    const extractedData = await extractExpenseDetails(fileBuffer, mimeType, originalName);
     
-    // Add the imageUrl to the extracted data
-    extractedData.imageUrl = `/${imagePath.replace(/\\/g, '/')}`;
+    // Convert memory buffer to Base64 data URL for permanent MongoDB persistence on Vercel
+    const base64Data = fileBuffer.toString('base64');
+    extractedData.imageUrl = `data:${mimeType};base64,${base64Data}`;
 
     res.status(200).json(extractedData);
   } catch (error) {

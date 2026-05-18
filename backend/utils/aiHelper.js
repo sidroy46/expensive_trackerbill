@@ -10,12 +10,12 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
  * @param {string} mimeType - The mime type of the image.
  * @returns {Promise<Object>} - The extracted expense details.
  */
-const extractExpenseDetails = async (imagePath, mimeType) => {
+const extractExpenseDetails = async (fileBuffer, mimeType, originalName) => {
   try {
-    const fileBytes = fs.readFileSync(imagePath);
+    const fileBytes = fileBuffer;
     
     // Resolve mimeType unconditionally based on file extension so Gemini can always process it
-    const ext = path.extname(imagePath).toLowerCase();
+    const ext = path.extname(originalName).toLowerCase();
     let resolvedMimeType = 'image/jpeg'; // Default fallback
     if (ext === '.webp') resolvedMimeType = 'image/webp';
     else if (ext === '.png') resolvedMimeType = 'image/png';

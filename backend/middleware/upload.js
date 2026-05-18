@@ -1,18 +1,7 @@
 const multer = require('multer');
 const path = require('path');
-const crypto = require('crypto');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    // Generate a unique filename using crypto and original extension
-    const uniqueSuffix = crypto.randomBytes(16).toString('hex');
-    const ext = path.extname(file.originalname);
-    cb(null, uniqueSuffix + ext);
-  }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
