@@ -81,6 +81,11 @@ function connectDB() {
     return Promise.resolve(mongoose.connection);
   }
   
+  if (!MONGODB_URI) {
+    console.error('MongoDB connection error: MONGODB_URI is undefined!');
+    return Promise.reject(new Error('MONGODB_URI is undefined'));
+  }
+  
   console.log('Attempting to connect to MongoDB Atlas...');
   // Redact password in console log
   const redactedURI = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
