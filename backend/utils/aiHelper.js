@@ -2,7 +2,8 @@ const { GoogleGenAI } = require('@google/genai');
 const fs = require('fs');
 const path = require('path');
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKey = process.env.GEMINI_API_KEY || 'DUMMY_KEY_FOR_SERVERLESS_BOOT';
+const ai = new GoogleGenAI({ apiKey });
 
 /**
  * Extracts expense details from an image buffer or file path.
