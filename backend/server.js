@@ -6,12 +6,14 @@ const path = require('path');
 const fs = require('fs');
 const dns = require('dns');
 
-// Programmatic DNS fix for Node.js resolver issues with MongoDB Atlas SRV records
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1']);
-  console.log('DNS resolver successfully set to Google (8.8.8.8) and Cloudflare (1.1.1.1) for robust Atlas SRV lookup.');
-} catch (dnsErr) {
-  console.warn('Failed to set custom DNS servers, using system default:', dnsErr.message);
+// Programmatic DNS fix for Node.js resolver issues with MongoDB Atlas SRV records (Skip on Vercel!)
+if (!process.env.VERCEL) {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+    console.log('DNS resolver successfully set to Google (8.8.8.8) and Cloudflare (1.1.1.1) for robust Atlas SRV lookup.');
+  } catch (dnsErr) {
+    console.warn('Failed to set custom DNS servers, using system default:', dnsErr.message);
+  }
 }
 
 // Load environment variables
@@ -48,10 +50,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+// Create uploads directory if it doesn't exist (Only in local development, skip on Vercel!)
+if (!process.env.VERCEL) {
+  const uploadDir = path.join(__dirname, 'uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+  }
 }
 
 // Database connection middleware (connects lazily on every request to prevent Vercel boot timeouts)
