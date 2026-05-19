@@ -84,6 +84,8 @@ app.get('/api/diagnostics', (req, res) => {
     vercel: !!process.env.VERCEL,
     mongodb_uri_exists: !!process.env.MONGODB_URI,
     gemini_api_key_exists: !!process.env.GEMINI_API_KEY,
+    langsmith_tracing: process.env.LANGSMITH_TRACING === 'true',
+    langsmith_project: process.env.LANGSMITH_PROJECT,
     database_connected: mongoose.connection.readyState === 1
   });
 });

@@ -1,4 +1,5 @@
 const { GoogleGenAI } = require('@google/genai');
+const { traceable } = require('langsmith/traceable');
 const fs = require('fs');
 const path = require('path');
 
@@ -11,7 +12,7 @@ const ai = new GoogleGenAI({ apiKey });
  * @param {string} mimeType - The mime type of the image.
  * @returns {Promise<Object>} - The extracted expense details.
  */
-const extractExpenseDetails = async (fileBuffer, mimeType, originalName) => {
+const extractExpenseDetails = traceable(async (fileBuffer, mimeType, originalName) => {
   try {
     const fileBytes = fileBuffer;
     
@@ -73,6 +74,9 @@ const extractExpenseDetails = async (fileBuffer, mimeType, originalName) => {
     console.error('Error extracting details with Gemini:', error);
     throw new Error('Failed to extract details from image');
   }
-};
+}, {
+  run_type: 'llm',
+  name: 'ExtractExpenseDetailsGemini'
+});
 
 module.exports = { extractExpenseDetails };
