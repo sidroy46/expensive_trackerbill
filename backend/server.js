@@ -111,7 +111,9 @@ function connectDB() {
   const redactedURI = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
   console.log(`Connection URI: ${redactedURI}`);
 
-  return mongoose.connect(MONGODB_URI)
+  return mongoose.connect(MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000 // Fast-fail after 5 seconds instead of hanging for 30s
+  })
     .then((db) => {
       cachedDb = db;
       console.log('MongoDB Connected');
